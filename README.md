@@ -18,10 +18,21 @@ allow fully on-chain minting.
 
 Immediate issue - you need to work around lack of loops and sleep() function.
 
+- Step one of contract, sign up for the raffle.  
+- Step two, randomly select the raffle winners.
+
+
+Issues:
+- How do we make signing up for the raffle cheap, but prevent botting?
+
+<!-- 
+
+
+
 ## Bot viz
 
 Look at 'true' ownership of NFTS - we can probably identify bot activity by
-look at tumble.
+look at tumble. -->
 
 ---
 ## Project criteria
