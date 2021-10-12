@@ -10,7 +10,8 @@ contract Raffle {
   mapping(address => bool) public winners;
 
 
-  constructor() {
+  constructor() public {
+    owner = msg.sender;
   }
   
   // does nothing for now, could have checks on address used.
@@ -31,11 +32,11 @@ contract Raffle {
 
   // run the raffle. Use Chainlinks' RNG provider.
   function raffle() public onlyOwner() returns (bool) {
-
+    return true;
   }
 
   // mint one of the NFTs
   function mint() public payable returns (bool) {
-
+    return true;
   }
 }
