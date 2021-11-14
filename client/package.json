@@ -1,8 +1,24 @@
 {
-  "name": "client",
+  "name": "bootcamp_final_project",
   "version": "0.1.0",
+  "description": "2021 bootcamp demo project",
+  "keywords": [
+    "react",
+    "web3",
+    "dapp",
+    "frontend"
+  ],
+  "author": "William Grant <hello@wpg.io>",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/wllgrnt/blockchain-developer-bootcamp-final-project"
+  },
   "dependencies": {
+    "@ethersproject/providers": "^5.1.2",
+    "@ethersproject/units": "^5.1.0",
+    "@web3-react/core": "latest",
+    "@web3-react/injected-connector": "latest",
     "react": "16.11.0",
     "react-dom": "16.11.0",
     "react-scripts": "3.2.0",
