@@ -8,55 +8,44 @@ import "./App.css";
 // import getWeb3 from "./getWeb3";
 
 class App extends Component {
-  state = { storageValue: 0, web3: null, accounts: null, contract: null };
+  state = { storageValue: 0, web3: null, accounts: null, contract: null};
 
-  // componentDidMount = async () => {
-  //   try {
-  // //     // Get network provider and web3 instance.
-  //     // const web3 = await getWeb3();
-  //     const web3 = new Web3(window.ethereum);
-  //     this.setState({ web3});
-  //   }
-  //   catch (error) {
-  //     alert('Failed to load web3');
-  //     console.error(error);
-  //   }
-  //   };
-  //     // Use web3 to get the user's accounts.
-  //     // const accounts = await web3.eth.getAccounts();
+   runExample = async () => {
+    const { web3 } = this.state;
+    if (web3 === null) {
+      this.getWeb3();
+    }
+    
+    const {contract, accounts} = this.state;
 
-  //     // Get the contract instance.
-  //     // const networkId = await web3.eth.net.getId();
-  //     // const deployedNetwork = SimpleStorageContract.networks[networkId];
-  //     // const instance = new web3.eth.Contract(
-  //     //   SimpleStorageContract.abi,
-  //     //   deployedNetwork && deployedNetwork.address,
-  //     // );
+    // Stores a given value, 5 by default.
+    await contract.methods.set(5).send({ from: accounts[0] });
 
-  //     // Set web3, accounts, and contract to the state, and then proceed with an
-  //     // example of interacting with the contract's methods.
-  //   //   this.setState({ web3, accounts, contract: instance }, this.runExample);
-  //   } catch (error) {
-  //     // Catch any errors for any of the above operations.
-  //     alert(
-  //       `Failed to load web3, accounts, or contract. Check console for details.`,
-  //     );
-  //     console.error(error);
-  //   }
-  // };
+    // Get the value from the contract to prove it worked.
+    const response = await contract.methods.get().call();
 
-  // runExample = async () => {
+    // Update state with the result.
+    this.setState({ storageValue: response });
+  };
+
+  // storeValue = async () => {
   //   const { accounts, contract } = this.state;
+  //   await this.getValue();
+  //   await contract.methods.set(this.state.storageValue + 5, { from: accounts[0] });
+  //   await this.getValue();
+  // }
 
-  //   // Stores a given value, 5 by default.
-  //   await contract.methods.set(5).send({ from: accounts[0] });
+  getValue = async () => {
+    const { contract } = this.state;
+    const response = await contract.methods.get().call();
+    this.setState({ storageValue: response});
+  }
 
-  //   // Get the value from the contract to prove it worked.
-  //   const response = await contract.methods.get().call();
 
-  //   // Update state with the result.
-  //   this.setState({ storageValue: response });
-  // };
+
+
+
+
 
   getWeb3 = async () => {
       if (window.ethereum) {
@@ -100,10 +89,6 @@ class App extends Component {
   };
 
   render() {
-    // if (!this.state.web3) {
-    //   return <div>Loading Web3, accounts, and contract...</div>;
-    // }
-
     return (
       <div className="App">
         <button onClick={this.connectToWallet.bind(this)}>Connect</button>
@@ -118,7 +103,12 @@ class App extends Component {
         <p>
           Try changing the value stored on <strong>line 42</strong> of App.js.
         </p>
-        <div>The stored value is: {this.state.storageValue}</div>
+        <button onClick={this.runExample.bind(this)}>Add 5 to the balance</button>
+        <div>
+          <p>The stored value is: {this.state.storageValue}</p>
+        <button onClick={this.getValue.bind(this)}>Refresh</button>
+
+        </div>
       </div>
     );
   }
