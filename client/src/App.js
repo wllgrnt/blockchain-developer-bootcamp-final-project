@@ -1,127 +1,28 @@
-import React, { Component } from "react";
-import SimpleStorageContract from "./contracts/SimpleStorage.json";
-// import getWeb3 from "./getWeb3";
-import Web3 from "web3";
+import React from 'react';
+import { Web3ReactProvider } from '@web3-react/core';
+import { ethers } from 'ethers';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Route } from 'react-router-dom';
+import './styles/App.css';
+import Home from './pages/Home';
+import Header from './components/Header';
+import { AppContextProvider } from './AppContext';
 
-import "./App.css";
-// import getWeb3 from "./getWeb3";
-// import getWeb3 from "./getWeb3";
-
-class App extends Component {
-  state = { storageValue: 0, web3: null, accounts: null, contract: null };
-
-  // componentDidMount = async () => {
-  //   try {
-  // //     // Get network provider and web3 instance.
-  //     // const web3 = await getWeb3();
-  //     const web3 = new Web3(window.ethereum);
-  //     this.setState({ web3});
-  //   }
-  //   catch (error) {
-  //     alert('Failed to load web3');
-  //     console.error(error);
-  //   }
-  //   };
-  //     // Use web3 to get the user's accounts.
-  //     // const accounts = await web3.eth.getAccounts();
-
-  //     // Get the contract instance.
-  //     // const networkId = await web3.eth.net.getId();
-  //     // const deployedNetwork = SimpleStorageContract.networks[networkId];
-  //     // const instance = new web3.eth.Contract(
-  //     //   SimpleStorageContract.abi,
-  //     //   deployedNetwork && deployedNetwork.address,
-  //     // );
-
-  //     // Set web3, accounts, and contract to the state, and then proceed with an
-  //     // example of interacting with the contract's methods.
-  //   //   this.setState({ web3, accounts, contract: instance }, this.runExample);
-  //   } catch (error) {
-  //     // Catch any errors for any of the above operations.
-  //     alert(
-  //       `Failed to load web3, accounts, or contract. Check console for details.`,
-  //     );
-  //     console.error(error);
-  //   }
-  // };
-
-  // runExample = async () => {
-  //   const { accounts, contract } = this.state;
-
-  //   // Stores a given value, 5 by default.
-  //   await contract.methods.set(5).send({ from: accounts[0] });
-
-  //   // Get the value from the contract to prove it worked.
-  //   const response = await contract.methods.get().call();
-
-  //   // Update state with the result.
-  //   this.setState({ storageValue: response });
-  // };
-
-  getWeb3 = async () => {
-      if (window.ethereum) {
-        const web3 = new Web3(window.ethereum);
-        try {
-          // Request account access if needed
-          await window.ethereum.enable();
-          // Accounts now exposed
-          return web3;
-        } catch (error) {
-          console.log(error);
-        }
-      }
-      // Legacy dapp browsers...
-      else if (window.web3) {
-        // Use Mist/MetaMask's provider.
-        const web3 = window.web3;
-        return web3;
-      }
-    return null;
-  }
-
-  connectToWallet = async (event) => {
-    try{
-      const web3 = await this.getWeb3();
-      const accounts = await web3.eth.getAccounts();
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = SimpleStorageContract.networks[networkId];
-      const instance = new web3.eth.Contract(
-        SimpleStorageContract.abi,
-        deployedNetwork && deployedNetwork.address,
-      );
-      this.setState({ web3, accounts, contract: instance });
-    } catch (error) {
-      // Catch any errors for any of the above operations.
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
-      );
-      console.error(error);
-    }
-  };
-
-  render() {
-    // if (!this.state.web3) {
-    //   return <div>Loading Web3, accounts, and contract...</div>;
-    // }
-
-    return (
-      <div className="App">
-        <button onClick={this.connectToWallet.bind(this)}>Connect</button>
-
-        <h1>Good to Go!</h1>
-        <p>Your Truffle Box is installed and ready.</p>
-        <h2>Smart Contract Example</h2>
-        <p>
-          If your contracts compiled and migrated successfully, below will show
-          a stored value of 5 (by default).
-        </p>
-        <p>
-          Try changing the value stored on <strong>line 42</strong> of App.js.
-        </p>
-        <div>The stored value is: {this.state.storageValue}</div>
-      </div>
-    );
-  }
+function getLibrary(provider) {
+  return new ethers.providers.Web3Provider(provider);
 }
+
+const App = () => {
+  return (
+    <AppContextProvider>
+      <Web3ReactProvider getLibrary={getLibrary}>
+        <div>
+          <Header />
+          <Route exact path="/" component={Home} />
+        </div>
+      </Web3ReactProvider>
+    </AppContextProvider>
+  );
+};
 
 export default App;
