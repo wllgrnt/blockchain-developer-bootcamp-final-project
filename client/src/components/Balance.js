@@ -32,12 +32,13 @@ function Balance() {
     }, [account, library, chainId]) // ensures refresh if referential identity of library doesn't change across chainIds
   
     return (
-      <>
-        <span>Balance</span>
-        <span role="img" aria-label="gold">
+      <><div>
+        <span>Balance: </span>
+        {/* <span role="img" aria-label="gold">
           💰
-        </span>
+        </span> */}
         <span>{balance === null ? 'Error' : balance ? `Ξ${formatEther(balance)}` : ''}</span>
+        </div>
       </>
     )
   }

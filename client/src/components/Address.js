@@ -5,11 +5,11 @@ export function Address() {
     const { account } = useWeb3React()
   
     return (
-      <>
-        <span>Account</span>
-        <span role="img" aria-label="robot">
+      <><div>
+        <span>Address: </span>
+        {/* <span role="img" aria-label="robot">
           🤖
-        </span>
+        </span> */}
         <span>
           {account === null
             ? '-'
@@ -17,6 +17,7 @@ export function Address() {
             ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}`
             : ''}
         </span>
+        </div>
       </>
     )
   }

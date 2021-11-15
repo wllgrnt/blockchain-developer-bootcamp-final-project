@@ -22,13 +22,12 @@ function Header() {
 
   return (
     <>
-      <h1 style={{ margin: '1rem', textAlign: 'right' }}>{active ? '🟢' : error ? '🔴' : '🟠'}</h1>
       <h3
         style={{
           display: 'grid',
           gridGap: '1rem',
-          gridTemplateColumns: '1fr min-content 1fr',
-          maxWidth: '20rem',
+          gridTemplateColumns: '1fr 1fr 1fr 1fr',
+          maxWidth: '50rem',
           lineHeight: '2rem',
           margin: 'auto'
         }}
@@ -37,6 +36,8 @@ function Header() {
         <BlockNumber />
         <Address />
         <Balance />
+        {/* <h1 style={{ margin: '1rem', textAlign: 'right' }}>{active ? '🟢' : error ? '🔴' : '🟠'}</h1> */}
+
       </h3>
     </>
   )
@@ -239,6 +240,7 @@ function App() {
           </button>
         )}
         {/* {!!(chainId) && (
+          // Add a contract call in here.
           <button
             style={{
               height: '3rem',

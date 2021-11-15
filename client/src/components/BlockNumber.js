@@ -36,12 +36,14 @@ function BlockNumber() {
     }, [library, chainId]) // ensures refresh if referential identity of library doesn't change across chainIds
 
     return (
-        <>
-            <span>Block Number</span>
-            <span role="img" aria-label="numbers">
+        <> 
+        <div>
+            <span>Block Number: </span>
+            {/* <span role="img" aria-label="numbers">
                 🔢
-            </span>
+            </span> */}
             <span>{blockNumber === null ? 'Error' : blockNumber || ''}</span>
+            </div>
         </>
     )
 }

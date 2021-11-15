@@ -5,11 +5,13 @@ function ChainId() {
     const { chainId } = useWeb3React()
     return (
         <>
-            <span>Chain Id</span>
-            <span role="img" aria-label="chain">
+            <div>
+            <span>Chain Id: </span>
+            {/* <span role="img" aria-label="chain">
                 ⛓
-            </span>
+            </span> */}
             <span>{chainId === null ? '' : chainId}</span>
+            </div>
         </>
     )
 }
