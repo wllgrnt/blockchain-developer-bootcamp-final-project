@@ -13,7 +13,7 @@ export const useSimpleStorage = () => {
   const { account, chainId } = useWeb3React();
   const { isValidNetwork } = useIsValidNetwork();
   // const cTokenContractAddress = '0xd6801a1dffcd0a410336ef88def4320d6df1883e'; // rinkeby
-  const deployedNetwork = SimpleStorageContract.networks[5777];  // TODO set this beforehand
+  const deployedNetwork = SimpleStorageContract.networks[4];  // TODO set this beforehand
   const storageAddress = deployedNetwork.address;
   const storageContract = useContract(storageAddress, SimpleStorageContract.abi);
   const { setBalance, setExchangeRate, setTxnStatus, storageBalance, exchangeRate } = useAppContext();
@@ -41,24 +41,9 @@ export const useSimpleStorage = () => {
     if (account && isValidNetwork) {
       try {
         setTxnStatus('LOADING');
-        console.log(amount);
-        console.log(storageContract.address);
-        console.log(storageBalance);
-        console.log(storageContract.interface);
         const txn = await storageContract.set(amount); 
-        // {
-        //   value: 0,
-        //   from: account,
-        //   x: amount,
-        // });
         const result = await txn.wait();
-
-        console.log(result);
-        console.log('getting');
         await getBalance();
-        console.log('got');
-        console.log(storageBalance);
-
         setTxnStatus('COMPLETE');
       } catch (error) {
         console.log(error);
