@@ -21,22 +21,22 @@ const MetamaskConnectButton = () => {
 
   if (active) {
     return (
-      <Card className="d-flex flex-row justify-content-between" style={{ width: 350 }}>
-        <MetamaskLogo />
+      <Card className="d-flex flex-row justify-content-between" style={{ width: 300 }}>
+        {/* <MetamaskLogo /> */}
+        <ConnectBtn onClick={deactivate}>Log Out</ConnectBtn>
         <Text uppercase color="green" t3 lineHeight="40px" className="mx-4">
           {shortenAddress(account)}
         </Text>
-        <ConnectBtn onClick={deactivate}>Log Out</ConnectBtn>
       </Card>
     );
   }
 
   return (
-    <Card className="d-flex flex-row justify-content-between" style={{ width: 350 }}>
-      <MetamaskLogo />
-      <Text uppercase color="green" t3 lineHeight="40px" className="mx-2">
+    <Card className="d-flex flex-row justify-content-between" style={{ width: 300 }}>
+      {/* <MetamaskLogo /> */}
+      {/* <Text uppercase color="green" t3 lineHeight="40px" className="mx-2">
         Metamask
-      </Text>
+      </Text> */}
       <ConnectBtn onClick={() => activate(injected)}>Connect</ConnectBtn>
     </Card>
   );

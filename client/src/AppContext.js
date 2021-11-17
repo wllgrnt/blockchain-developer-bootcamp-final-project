@@ -4,6 +4,8 @@ const initialContext = {
   ethBalance: '--',
   setEthBalance: () => {},
   cTokenBalance: '--',
+  storageBalance: 0,
+  setBalance: () => {},
   setCTokenBalance: () => {},
   exchangeRate: 0,
   setExchangeRate: () => {},
@@ -32,6 +34,12 @@ const appReducer = (state, { type, payload }) => {
         ...state,
         exchangeRate: payload,
       };
+
+      case 'SET_STORAGE_BALANCE':
+        return {
+          ...state,
+          storageBalance: payload,
+        };
 
     case 'SET_WALLET_MODAL':
       return {
@@ -66,6 +74,10 @@ export const AppContextProvider = ({ children }) => {
     exchangeRate: store.exchangeRate,
     setExchangeRate: (rate) => {
       dispatch({ type: 'SET_EXCHANGE_RATE', payload: rate });
+    },
+    storageBalance: store.storageBalance,
+    setBalance: (balance) => {
+      dispatch({type: 'SET_STORAGE_BALANCE', payload: balance});
     },
     isWalletConnectModalOpen: store.isWalletConnectModalOpen,
     setWalletConnectModal: (open) => {
