@@ -116,16 +116,34 @@ class App extends Component {
     }
   };
 
+  buyTicket = async () => {
+    try {
+      await this.state.contract.methods.buyTicket().send({ from: this.state.accounts[0], value: 0.05});
+    }
+    catch (error) {
+      if (error.code === 4001) {
+        alert('user denied transaction signature');
+      }
+      else {
+        alert('transaction failed');
+      }
+      console.log(error)
+    }
+  };
+
   render() {
     return (
       <Container className="App">
       <button onClick={this.connectToWallet.bind(this)}>Connect</button>
-        <h1>Simple Storage</h1>
+        <h1>Raffle</h1>
         {this.state.connected && <div>
           <p>Connected with account: {this.state.accounts}</p>
           <p>Contract address: {this.state.address} </p>
           <p>Contract stored value is: {this.state.storageValue}</p>
+          <p>Total number of tickets sold is: {this.state.numberOfTickets || 0} </p>
+          <p> You have {this.state.yourTickets || 0} tickets </p>
           <button onClick={this.setStorageValueToFive.bind(this)}>Set storage to 5</button>
+          <button onClick={this.buyTicket.bind(this)}>Buy ticket</button>
           <button onClick={this.setStorageValueToZero.bind(this)}>Set storage to 0</button>
         </div>
         }
