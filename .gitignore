@@ -1,3 +1,6 @@
 build/
 .*.un~
 *.*~
+.env
+node_modules/
+.*.swp
