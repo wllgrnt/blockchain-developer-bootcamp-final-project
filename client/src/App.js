@@ -1,12 +1,41 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import Web3 from "web3";
 import { Container } from 'react-bootstrap';
 
 import "./App.css";
 
+// window.onunhandledrejection = function(evt) { console.log(evt)};
+
+// process.on('unhandledRejection', (reason, p) => {
+//   console.error(`Unhandled Rejection`);
+// });
+// const Input = () => {
+//   const [ stor, setStor ] = useState(0);
+//   return (
+//       <div className="d-flex">
+//         <input
+//           type="number"
+//           value={stor}
+//           onChange={(e) => {
+//             if (e.target.value >= 0) {
+//               setStor(e.target.value);
+//             }
+//           }}
+//         />
+//       </div>
+//   );
+// };
+
+
 class App extends Component {
-  state = { connected: false, storageValue: 0, web3: null, accounts: null, contract: null, address: null };
+  state = { connected: false, storageValue: 0, web3: null, accounts: null, contract: null, address: null};
+
+  componentDidCatch(error) {
+    // Log or store the error
+    console.error(error);
+  }
+
 
   getWeb3 = async () => {
     if (window.ethereum) {
@@ -51,8 +80,9 @@ class App extends Component {
   };
 
   setStorageValueToFive = async (event) => {
+    // const [txnStatus, setTxnStatus] = useState('');
     try {
-      await this.state.contract.methods.set(5).send({ from: this.state.accounts[0] });
+      this.state.contract.methods.set(5).send({ from: this.state.accounts[0] });
       const value = await this.state.contract.methods.get().call();
       this.setState({ storageValue: value });
     }
@@ -62,9 +92,21 @@ class App extends Component {
     }
   };
 
-  setStorageValueToZero = async (event) => {
+  submitTransaction = async (value) => {
+    try{
+      await this.state.contract.methods.set(value).send({ from: this.state.accounts[0] });
+  }
+  catch(error) {
+    if (error.code === 4001) {
+      alert('user denied transaction signature');
+    }
+    console.log(error);
+  }
+  }
+
+  setStorageValueToZero = async () => {
     try {
-      await this.state.contract.methods.set(0).send({ from: this.state.accounts[0] });
+      await this.submitTransaction(0).catch(e => {console.error(e)});
       const value = await this.state.contract.methods.get().call();
       this.setState({ storageValue: value });
     }
@@ -73,8 +115,6 @@ class App extends Component {
       console.log(error);
     }
   };
-
-
 
   render() {
     return (
