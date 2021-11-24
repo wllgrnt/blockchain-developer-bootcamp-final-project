@@ -18,12 +18,18 @@ allow fully on-chain minting.
 
 Immediate issue - you need to work around lack of loops and sleep() function.
 
+
+
 - Step one of contract, sign up for the raffle.  
 - Step two, randomly select the raffle winners.
 
 
 Issues:
 - How do we make signing up for the raffle cheap, but prevent botting?
+
+
+TODO FUTURE IMPROVEMENTS
+EXPLAIN THAT THE WINNER FUNCTION CAN'T RUN LOCALLY DUE TO ITS ORACLE DEPENDENCE
 
 <!-- 
 
@@ -42,9 +48,9 @@ Project must:
 1. Contain a README.md file which describes the project, describes the directory structure, and where the frontend project can be accessed (see #8).
 2. Contain smart contract(s) which:
    -  Are commented to the specs described here
-   -   Use at least two design patterns from the "Smart Contracts" section
+   -   X Use at least two design patterns from the "Smart Contracts" section
    -   Protect against two attack vectors from the "Smart Contracts" section with its the SWC number
-   -   Inherits from at least one library or interface
+   -   X Inherits from at least one library or interface
    -   Can be easily compiled, migrated and tested (see #5)
 3. Contain a Markdown file named design_pattern_decisions.md and avoiding_common_attacks.md describing your design patterns and security measures.
 4. Have at least five unit tests for your smart contract(s) that pass. In the code, include a sentence or two explaining what the tests are covering their expected behavior.
