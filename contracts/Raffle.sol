@@ -65,7 +65,7 @@ contract Raffle is Ownable, VRFConsumerBase {
         // return LINK to owner
         uint256 link_balance = LINK.balanceOf(address(this));
         LINK.transfer(msg.sender, link_balance);
-    }
+    }  
 
     /// Utility to check that the contract is funded before it's used.
     function linkBalance() public view returns (uint256 balance) {
@@ -88,6 +88,19 @@ contract Raffle is Ownable, VRFConsumerBase {
   function ticketsSold() public view returns (uint) {
     return entrants_array.length;
   } 
+
+  /// Reset the raffle, removing all entrants
+  function resetRaffle() public onlyOwner {
+    for (uint i=0; i<entrants_array.length; i++) {
+      entrants[entrants_array[i]] = false;
+    }
+    delete entrants_array;
+  }
+
+  /// Used to check entry status on the frontend.
+  function entrantInRaffle() public view returns (bool) {
+    return entrants[msg.sender];
+  }
 
   /// Used to distinguish the winner on the frontend.
   /// @dev This is basically a no-op currently but could be used to e.g. mint coveted NFTs.
