@@ -9,9 +9,10 @@
 //   - check that if the owner calls the function with zero entrants there's an error
 //   - check that non-owners can't call the function
 //  ticketsSold:
-//   - check that the behaviour is expected (after three entrants, return 3)
+//   - check that the behaviour is expected (e.g. after three entrants, return 3)
 //  withdrawLink:
 //   - check that non-owners cannot call this function.
+
 const Raffle = artifacts.require("Raffle");
 const truffleAssert = require('truffle-assertions');
 
@@ -25,12 +26,12 @@ contract("Raffle", accounts => {
   it("resets the raffle to have zero entrants", async () => {
     // add some entrants
     for (let i = 0; i < 5; i++) {
-      await raffleInstance.claimTicket({from: accounts[i]});
+      await raffleInstance.claimTicket({ from: accounts[i] });
     }
-    let ticketsSold = await raffleInstance.ticketsSold({from: accounts[0]});
+    let ticketsSold = await raffleInstance.ticketsSold({ from: accounts[0] });
     assert.equal(ticketsSold, 5);
-    await raffleInstance.resetRaffle({from: accounts[0]});
-    ticketsSold = await raffleInstance.ticketsSold({from: accounts[0]});
+    await raffleInstance.resetRaffle({ from: accounts[0] });
+    ticketsSold = await raffleInstance.ticketsSold({ from: accounts[0] });
     assert.equal(ticketsSold, 0);
 
   });
@@ -38,66 +39,66 @@ contract("Raffle", accounts => {
   it("can't reset the raffle if not an owner", async () => {
     // add some entrants
     for (let i = 0; i < 5; i++) {
-      await raffleInstance.claimTicket({from: accounts[i]});
+      await raffleInstance.claimTicket({ from: accounts[i] });
     }
-    let ticketsSold = await raffleInstance.ticketsSold({from: accounts[0]});
+    let ticketsSold = await raffleInstance.ticketsSold({ from: accounts[0] });
     assert.equal(ticketsSold, 5);
-    await truffleAssert.reverts(raffleInstance.resetRaffle({from: accounts[1]}));
-    ticketsSold = await raffleInstance.ticketsSold({from: accounts[0]});
+    await truffleAssert.reverts(raffleInstance.resetRaffle({ from: accounts[1] }));
+    ticketsSold = await raffleInstance.ticketsSold({ from: accounts[0] });
     assert.equal(ticketsSold, 5);
 
   });
-  
+
 
   it("can't call raffle with no entrants", async () => {
-    await raffleInstance.resetRaffle({from: accounts[0]});
-    await truffleAssert.reverts(raffleInstance.getRaffleWinner({from: accounts[0]}));
+    await raffleInstance.resetRaffle({ from: accounts[0] });
+    await truffleAssert.reverts(raffleInstance.getRaffleWinner({ from: accounts[0] }));
   });
-  
+
   it("five claims give five entrants", async () => {
-    await raffleInstance.resetRaffle({from: accounts[0]});
+    await raffleInstance.resetRaffle({ from: accounts[0] });
     for (let i = 0; i < 5; i++) {
-      await raffleInstance.claimTicket({from: accounts[i]});
-      let entrantInRaffle = await raffleInstance.entrantInRaffle({from: accounts[i]});
+      await raffleInstance.claimTicket({ from: accounts[i] });
+      let entrantInRaffle = await raffleInstance.entrantInRaffle({ from: accounts[i] });
       assert.isTrue(entrantInRaffle, 'Entrant not successfully added');
     }
   });
 
   it("no double-entry", async () => {
-    await raffleInstance.resetRaffle({from: accounts[0]});
+    await raffleInstance.resetRaffle({ from: accounts[0] });
 
     // entrant should be added.
-    await raffleInstance.claimTicket({from: accounts[0]});
-    entrantInRaffle = await raffleInstance.entrantInRaffle({from: accounts[0]});
+    await raffleInstance.claimTicket({ from: accounts[0] });
+    entrantInRaffle = await raffleInstance.entrantInRaffle({ from: accounts[0] });
     assert.isTrue(entrantInRaffle)
     // entrant should not be allowed to enter again.
-    await truffleAssert.reverts(raffleInstance.claimTicket({from: accounts[0]}));
+    await truffleAssert.reverts(raffleInstance.claimTicket({ from: accounts[0] }));
   });
 
 
   it("non-owner can't call the raffle", async () => {
-    await raffleInstance.resetRaffle({from: accounts[0]});
+    await raffleInstance.resetRaffle({ from: accounts[0] });
 
     // add an entrant
-    await raffleInstance.claimTicket({from: accounts[0]});
-    await truffleAssert.reverts(raffleInstance.getRaffleWinner({from: accounts[1]}));
+    await raffleInstance.claimTicket({ from: accounts[0] });
+    await truffleAssert.reverts(raffleInstance.getRaffleWinner({ from: accounts[1] }));
   });
 
   it("ticketSold should return proper values", async () => {
-    await raffleInstance.resetRaffle({from: accounts[0]});
+    await raffleInstance.resetRaffle({ from: accounts[0] });
 
-    let ticketsSold = await raffleInstance.ticketsSold({from: accounts[0]});
+    let ticketsSold = await raffleInstance.ticketsSold({ from: accounts[0] });
     assert.equal(ticketsSold, 0, 'should return 0 with no entrants');
-    await raffleInstance.claimTicket({from: accounts[0]});
-    ticketsSold = await raffleInstance.ticketsSold({from: accounts[0]});
+    await raffleInstance.claimTicket({ from: accounts[0] });
+    ticketsSold = await raffleInstance.ticketsSold({ from: accounts[0] });
     assert.equal(ticketsSold, 1, 'should return 1 with one entrant');
-    await raffleInstance.claimTicket({from: accounts[1]});
-    ticketsSold = await raffleInstance.ticketsSold({from: accounts[0]});
+    await raffleInstance.claimTicket({ from: accounts[1] });
+    ticketsSold = await raffleInstance.ticketsSold({ from: accounts[0] });
     assert.equal(ticketsSold, 2, 'should return 2 with one entrant');
   });
 
   it("withdrawLink should only be callable by contract deployer", async () => {
-    await truffleAssert.reverts(raffleInstance.withdrawLink({from: accounts[1]}));
+    await truffleAssert.reverts(raffleInstance.withdrawLink({ from: accounts[1] }));
   });
 });
 
