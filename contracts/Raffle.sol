@@ -95,6 +95,7 @@ contract Raffle is Ownable, VRFConsumerBase {
             entrants[entrants_array[i]] = false;
         }
         delete entrants_array;
+        winner = address(0);
     }
 
     /// Used to check entry status on the frontend.
