@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 const private_key = process.env.ETH_RINKEBY_PRIVATE_KEY;
 const infura_url = process.env.INFURA_RINKEBY_URL;
+const etherscan_key = process.env.ETHERSCAN_KEY;
 
 module.exports = {
   contracts_build_directory: path.join(__dirname, "client/src/contracts"),
@@ -22,5 +23,11 @@ module.exports = {
     solc: {
       version: "pragma"
     }
+  },
+  plugins: [
+    'truffle-plugin-verify'
+  ],
+  api_keys: {
+    etherscan: etherscan_key
   }
 };

@@ -98,14 +98,14 @@ contract Raffle is Ownable, VRFConsumerBase {
     }
 
     /// Used to check entry status on the frontend.
-    function entrantInRaffle() public view returns (bool) {
-        return entrants[msg.sender];
+    function entrantInRaffle(address entrant) public view returns (bool) {
+        return entrants[entrant];
     }
 
     /// Used to distinguish the winner on the frontend.
     /// @dev This is basically a no-op currently but could be used to e.g. mint coveted NFTs.
     function claimPrize() public view returns (bool) {
-        if (msg.sender == winner) {
+        if (winner != address(0) && msg.sender == winner) {
             return true;
         } else {
             return false;

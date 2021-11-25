@@ -1,5 +1,5 @@
 import React, { Component, useState } from "react";
-import SimpleStorageContract from "./contracts/SimpleStorage.json";
+import RaffleContract from "./contracts/Raffle.json";
 import Web3 from "web3";
 import { Container } from 'react-bootstrap';
 
@@ -29,7 +29,15 @@ import "./App.css";
 
 
 class App extends Component {
-  state = { connected: false, storageValue: 0, web3: null, accounts: null, contract: null, address: null};
+  state = {
+    connected: false,
+    web3: null,
+    accounts: null,
+    contract: null,
+    address: null,
+    ticketsSold: null,
+    entrantInRaffle: false,
+  };
 
   componentDidCatch(error) {
     // Log or store the error
@@ -63,13 +71,23 @@ class App extends Component {
       const web3 = await this.getWeb3();
       const accounts = await web3.eth.getAccounts();
       const networkId = await web3.eth.net.getId();
-      const deployedNetwork = SimpleStorageContract.networks[networkId];
+      const deployedNetwork = RaffleContract.networks[networkId];
       const instance = new web3.eth.Contract(
-        SimpleStorageContract.abi,
+        RaffleContract.abi,
         deployedNetwork && deployedNetwork.address,
       );
-      const value = await instance.methods.get().call();
-      this.setState({ web3, accounts, connected: true, contract: instance, address: deployedNetwork.address, storageValue: value });
+      const ticketsSold = await instance.methods.ticketsSold().call();
+      const entrantInRaffle = await instance.methods.entrantInRaffle().call();
+      // TODO pass this in accounts[0]);
+      this.setState({
+        web3,
+        accounts,
+        connected: true,
+        contract: instance,
+        address: deployedNetwork.address,
+        ticketsSold: ticketsSold,
+        entrantInRaffle: entrantInRaffle
+      });
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -79,46 +97,11 @@ class App extends Component {
     }
   };
 
-  setStorageValueToFive = async (event) => {
-    // const [txnStatus, setTxnStatus] = useState('');
+  claimTicket = async (event) => {
     try {
-      this.state.contract.methods.set(5).send({ from: this.state.accounts[0] });
-      const value = await this.state.contract.methods.get().call();
-      this.setState({ storageValue: value });
-    }
-    catch (error) {
-      alert('transaction failed');
-      console.error(error);
-    }
-  };
-
-  submitTransaction = async (value) => {
-    try{
-      await this.state.contract.methods.set(value).send({ from: this.state.accounts[0] });
-  }
-  catch(error) {
-    if (error.code === 4001) {
-      alert('user denied transaction signature');
-    }
-    console.log(error);
-  }
-  }
-
-  setStorageValueToZero = async () => {
-    try {
-      await this.submitTransaction(0).catch(e => {console.error(e)});
-      const value = await this.state.contract.methods.get().call();
-      this.setState({ storageValue: value });
-    }
-    catch (error) {
-      alert('transaction failed');
-      console.log(error);
-    }
-  };
-
-  buyTicket = async () => {
-    try {
-      await this.state.contract.methods.buyTicket().send({ from: this.state.accounts[0], value: 0.05});
+      await this.state.contract.methods.claimTicket().send({ from: this.state.accounts[0] }).catch(e => { console.error(e) });
+      const ticketsSold = await this.state.contract.methods.ticketsSold().call();
+      this.setState({ ticketsSold: ticketsSold });
     }
     catch (error) {
       if (error.code === 4001) {
@@ -127,24 +110,63 @@ class App extends Component {
       else {
         alert('transaction failed');
       }
-      console.log(error)
+      console.error(error);
     }
   };
+
+  // submitTransaction = async (value) => {
+  //   try {
+  //     await this.state.contract.methods.set(value).send({ from: this.state.accounts[0] });
+  //   }
+  //   catch (error) {
+  //     if (error.code === 4001) {
+  //       alert('user denied transaction signature');
+  //     }
+  //     console.log(error);
+  //   }
+  // }
+
+  // setStorageValueToZero = async () => {
+  //   try {
+  //     await this.submitTransaction(0).catch(e => { console.error(e) });
+  //     const value = await this.state.contract.methods.get().call();
+  //     this.setState({ storageValue: value });
+  //   }
+  //   catch (error) {
+  //     alert('transaction failed');
+  //     console.log(error);
+  //   }
+  // };
+
+  // buyTicket = async () => {
+  //   try {
+  //     await this.state.contract.methods.buyTicket().send({ from: this.state.accounts[0], value: 0.05 });
+  //   }
+  //   catch (error) {
+  //     if (error.code === 4001) {
+  //       alert('user denied transaction signature');
+  //     }
+  //     else {
+  //       alert('transaction failed');
+  //     }
+  //     console.log(error)
+  //   }
+  // };
 
   render() {
     return (
       <Container className="App">
-      <button onClick={this.connectToWallet.bind(this)}>Connect</button>
+        <button onClick={this.connectToWallet.bind(this)}>Connect</button>
         <h1>Raffle</h1>
         {this.state.connected && <div>
           <p>Connected with account: {this.state.accounts}</p>
           <p>Contract address: {this.state.address} </p>
           <p>Contract stored value is: {this.state.storageValue}</p>
-          <p>Total number of tickets sold is: {this.state.numberOfTickets || 0} </p>
-          <p> You have {this.state.yourTickets || 0} tickets </p>
-          <button onClick={this.setStorageValueToFive.bind(this)}>Set storage to 5</button>
-          <button onClick={this.buyTicket.bind(this)}>Buy ticket</button>
-          <button onClick={this.setStorageValueToZero.bind(this)}>Set storage to 0</button>
+          <p>Total number of tickets sold is: {this.state.ticketsSold || 0} </p>
+          <p> You are {!this.state.entrantInRaffle && "not"} in the raffle </p>
+          {/* <button onClick={this.setStorageValueToFive.bind(this)}>Set storage to 5</button> */}
+          <button onClick={this.claimTicket.bind(this)}>Buy ticket</button>
+          {/* <button onClick={this.setStorageValueToZero.bind(this)}>Set storage to 0</button> */}
         </div>
         }
       </Container>
