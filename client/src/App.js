@@ -5,29 +5,6 @@ import { Container } from 'react-bootstrap';
 
 import "./App.css";
 
-// window.onunhandledrejection = function(evt) { console.log(evt)};
-
-// process.on('unhandledRejection', (reason, p) => {
-//   console.error(`Unhandled Rejection`);
-// });
-// const Input = () => {
-//   const [ stor, setStor ] = useState(0);
-//   return (
-//       <div className="d-flex">
-//         <input
-//           type="number"
-//           value={stor}
-//           onChange={(e) => {
-//             if (e.target.value >= 0) {
-//               setStor(e.target.value);
-//             }
-//           }}
-//         />
-//       </div>
-//   );
-// };
-
-
 class App extends Component {
   state = {
     connected: false,
@@ -38,6 +15,7 @@ class App extends Component {
     ticketsSold: null,
     entrantInRaffle: false,
   };
+  nullAddress = "0x0000000000000000000000000000000000000000";
 
   componentDidCatch(error) {
     // Log or store the error
@@ -69,6 +47,7 @@ class App extends Component {
   connectToWallet = async (event) => {
     try {
       const web3 = await this.getWeb3();
+      web3.eth.handleRevert = true;
       const accounts = await web3.eth.getAccounts();
       const networkId = await web3.eth.net.getId();
       const deployedNetwork = RaffleContract.networks[networkId];
@@ -77,7 +56,8 @@ class App extends Component {
         deployedNetwork && deployedNetwork.address,
       );
       const ticketsSold = await instance.methods.ticketsSold().call();
-      const entrantInRaffle = await instance.methods.entrantInRaffle().call();
+      const entrantInRaffle = await instance.methods.entrantInRaffle(accounts[0]).call();
+      const winner = await instance.methods.winner().call();
       // TODO pass this in accounts[0]);
       this.setState({
         web3,
@@ -86,7 +66,8 @@ class App extends Component {
         contract: instance,
         address: deployedNetwork.address,
         ticketsSold: ticketsSold,
-        entrantInRaffle: entrantInRaffle
+        entrantInRaffle: entrantInRaffle,
+        winner: winner
       });
     } catch (error) {
       // Catch any errors for any of the above operations.
@@ -99,9 +80,13 @@ class App extends Component {
 
   claimTicket = async (event) => {
     try {
-      await this.state.contract.methods.claimTicket().send({ from: this.state.accounts[0] }).catch(e => { console.error(e) });
+      await this.state.contract.methods.claimTicket().send({ from: this.state.accounts[0] }).on('error', function (error, receipt) {
+        console.log(error);
+      });
       const ticketsSold = await this.state.contract.methods.ticketsSold().call();
       this.setState({ ticketsSold: ticketsSold });
+      const entrantInRaffle = await this.state.contract.methods.entrantInRaffle(this.state.accounts[0]).call();
+      this.setState({ entrantInRaffle: entrantInRaffle });
     }
     catch (error) {
       if (error.code === 4001) {
@@ -114,44 +99,52 @@ class App extends Component {
     }
   };
 
-  // submitTransaction = async (value) => {
-  //   try {
-  //     await this.state.contract.methods.set(value).send({ from: this.state.accounts[0] });
-  //   }
-  //   catch (error) {
-  //     if (error.code === 4001) {
-  //       alert('user denied transaction signature');
-  //     }
-  //     console.log(error);
-  //   }
-  // }
+  resetRaffle = async (event) => {
+    try {
+      await this.state.contract.methods.resetRaffle().send({ from: this.state.accounts[0] }).on('error', function (error, receipt) {
+        console.log(error);
+      });
+      const ticketsSold = await this.state.contract.methods.ticketsSold().call();
+      this.setState({ ticketsSold: ticketsSold });
+      const entrantInRaffle = await this.state.contract.methods.entrantInRaffle(this.state.accounts[0]).call();
+      this.setState({ entrantInRaffle: entrantInRaffle });
+      const winner = await this.state.contract.methods.winner().call();
+      this.setState({ winner: winner });
+    }
+    catch (error) {
+      if (error.code === 4001) {
+        alert('user denied transaction signature');
+      }
+      else {
+        alert('transaction failed');
+      }
+      console.error(error);
+    }
+  };
 
-  // setStorageValueToZero = async () => {
-  //   try {
-  //     await this.submitTransaction(0).catch(e => { console.error(e) });
-  //     const value = await this.state.contract.methods.get().call();
-  //     this.setState({ storageValue: value });
-  //   }
-  //   catch (error) {
-  //     alert('transaction failed');
-  //     console.log(error);
-  //   }
-  // };
+  runRaffle = async (event) => {
+    try {
+      await this.state.contract.methods.getRaffleWinner().send({ from: this.state.accounts[0] }).on('error', function (error, receipt) {
+        console.log(error);
+      });
+      this.state.contract.once('RaffleWinnerChosen', (error, event) => {
+        const winner = this.state.contract.methods.winner();
+        this.setState({ winner: winner });
+      });
+      const winner = this.state.contract.methods.winner();
+      this.setState({ winner: winner });
+    }
+    catch (error) {
+      if (error.code === 4001) {
+        alert('user denied transaction signature');
+      }
+      else {
+        alert('transaction failed');
+      }
+      console.error(error);
+    }
+  };
 
-  // buyTicket = async () => {
-  //   try {
-  //     await this.state.contract.methods.buyTicket().send({ from: this.state.accounts[0], value: 0.05 });
-  //   }
-  //   catch (error) {
-  //     if (error.code === 4001) {
-  //       alert('user denied transaction signature');
-  //     }
-  //     else {
-  //       alert('transaction failed');
-  //     }
-  //     console.log(error)
-  //   }
-  // };
 
   render() {
     return (
@@ -161,11 +154,19 @@ class App extends Component {
         {this.state.connected && <div>
           <p>Connected with account: {this.state.accounts}</p>
           <p>Contract address: {this.state.address} </p>
-          <p>Contract stored value is: {this.state.storageValue}</p>
-          <p>Total number of tickets sold is: {this.state.ticketsSold || 0} </p>
+          <p>Total number of entrants is: {this.state.ticketsSold || 0} </p>
           <p> You are {!this.state.entrantInRaffle && "not"} in the raffle </p>
+          {/* {this.state.winner !== this.nullAddress && <p> winner is {this.state.winner}</p> } */}
+          {this.state.winner !== this.nullAddress && this.state.winner == this.state.accounts && <p> You are the winner! </p>}
+          {this.state.winner !== this.nullAddress && this.state.winner != this.state.accounts && <p> You did not win :(</p>}
+          {this.state.winner === this.nullAddress && <p> Raffle has not yet started</p>}
+
           {/* <button onClick={this.setStorageValueToFive.bind(this)}>Set storage to 5</button> */}
           <button onClick={this.claimTicket.bind(this)}>Buy ticket</button>
+          <h2>Admin zone</h2>
+          <button onClick={this.resetRaffle.bind(this)}>Reset Raffle</button>
+          <button onClick={this.runRaffle.bind(this)}>Run Raffle</button>
+
           {/* <button onClick={this.setStorageValueToZero.bind(this)}>Set storage to 0</button> */}
         </div>
         }
