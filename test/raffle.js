@@ -59,7 +59,7 @@ contract("Raffle", accounts => {
     await raffleInstance.resetRaffle({ from: accounts[0] });
     for (let i = 0; i < 5; i++) {
       await raffleInstance.claimTicket({ from: accounts[i] });
-      let entrantInRaffle = await raffleInstance.entrantInRaffle({ from: accounts[i] });
+      let entrantInRaffle = await raffleInstance.entrantInRaffle(accounts[i], { from: accounts[i] });
       assert.isTrue(entrantInRaffle, 'Entrant not successfully added');
     }
   });
@@ -69,7 +69,7 @@ contract("Raffle", accounts => {
 
     // entrant should be added.
     await raffleInstance.claimTicket({ from: accounts[0] });
-    entrantInRaffle = await raffleInstance.entrantInRaffle({ from: accounts[0] });
+    entrantInRaffle = await raffleInstance.entrantInRaffle(accounts[0], { from: accounts[0] });
     assert.isTrue(entrantInRaffle)
     // entrant should not be allowed to enter again.
     await truffleAssert.reverts(raffleInstance.claimTicket({ from: accounts[0] }));
