@@ -44,13 +44,5 @@ My address is 0xb6c5D999E32C806468A2fF165c2E679dDbD6e569 (williamgrant.eth).
 - some anti-bot measure
 - allow for multiple winners
 - make contract upgradable with UUPS.
+- listen to emitted events, update frontend
 
-
----
-6. Have a frontend interface built with a framework like React or HTML/CSS/JS that:
-     - Detects the presence of MetaMask
-     - Connects to the current account
-     - Displays information from your smart contract
-     - Allows a user to submit a transaction to update smart contract state
-     - Updates the frontend if the transaction is successful or not
-9. A screencast of you walking through your project, including submitting transactions and seeing the updated state. You can use a screenrecorder of your choosing or something like Loom, and you can share the link to the recording in your README.md.
